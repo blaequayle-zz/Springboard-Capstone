@@ -1,0 +1,38 @@
+---
+title: "Data_Wrangling"
+author: "Blae Quayle"
+date: "6/18/2017"
+output: 
+  md_document:
+    variant: markdown_github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Capstone Project Data Wrangling
+
+The following packages were loaded in preparation for data wrangling: readr, dplyr, tidyr and lubridate.
+
+They key data wrangling steps that were undertaken as part of this project were as follows:
+
+* Use glimpse(crime11to17) to review variable names, variable types, and number of observations. This reveals there are 11 variables - 6 characters, 3 numerics (1 integer, 2 double precision) and 2 factors. There are 498,628 observations in total.
+
+* Convert category and location_type to factor using as.factor().
+
+* Several of the variables contained no useful data for a civilian user. The variables context, persistent_id, id and location_subtype were removed with select() and variable names for category and location_type were changed to crime_type and service respectively, to make the dataset clearer using rename().
+
+* Checked columns for missing values using sapply(crime11to17, function(x) sum(is.na(x))). Only the outcome_status_category and outcome_status_date contain NA values and there is no plan to use these in the scope of the current project.
+
+* Use the lubridate functions year() and month() to create new columns called year and month from the original 'month' variable which was in format y-m.
+
+* Create dataframe for monthly crime statistics from 2011 to 2017. Abbreviate the crime_type into new variable called crime_abb to improve data visualisations using case_when() function nested within mutate(). The 'r group_by()' function is then used to sort by year, month and crime_abb. summarize() is used to get a count for each of the new groupings.
+
+* Repeat process for annual crime statistics from 2011 to 2016, 2017 removed as only a partial year. 
+
+* Create dataframe for seasonal crime numbers using case_when() to assign Spring (March to May), Summer (June to August), Autumn (September to November) or Winter (December to February) to new season variable. Removed Mar-2017 from analysis as not sufficient data to constitute a full season.
+
+* Save dataframes created using saveRDS for loading into analysis section.
+
+
