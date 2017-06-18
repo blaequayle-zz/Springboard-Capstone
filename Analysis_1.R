@@ -127,4 +127,4 @@ leaflet(spgons) %>% addTiles() %>%
 # addCircles(lng = latlong$longitude, lat = latlong$latitude,
 #            radius = .5, opacity = .2, col = "blue")
 
-#The heat map shows a concetration of crimes in Covent Garden and on South Bank.
+#The heat map shows a concentration of crimes in Covent Garden and on South Bank.
