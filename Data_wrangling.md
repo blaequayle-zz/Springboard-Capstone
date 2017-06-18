@@ -1,5 +1,8 @@
-Capstone Project Data Wrangling
-===============================
+Capstone Project
+----------------
+
+Data Wrangling
+==============
 
 The following packages were loaded in preparation for data wrangling: readr, dplyr, tidyr and lubridate.
 
