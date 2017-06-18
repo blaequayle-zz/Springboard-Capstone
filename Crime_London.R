@@ -7,6 +7,8 @@ library(tidyr)
 library(data.table)
 library(purrr)
 library(magrittr)
+library(ggplot2)
+library(readr)
 
 #Turn off (FALSE) R Studio feature of turning character strings automatically into factor variables
 options(stringsAsFactors = TRUE)
@@ -65,28 +67,8 @@ crime2017full <- cbind(crime2017full, latitude, longitude, outcome_status_catego
 #Use rbind to combine rows together
 crime11to17 <- rbind(crimedb, crime2017full)
 
-## Initial exploration of data
-table(crime11to17$category)
-table(crime11to17$location_type)
-table(crime11to17$month)
-
-# 15 categories - anti-social behaviour most prevalent crime, followed by other-theft and violent-crime
-
-simple.crime <- crimedb[c("latitude", "longitude", "category", "month")]
-
 saveRDS(crime11to17, "crime11to17.rds")
 saveRDS(crime2011to16, "crime11to16.rds")
 saveRDS(crime2017full, "crime17.rds")
 readRDS("crime11to17.rds")
 
-#Need smaller subset of data as causes R studio to crash with full set  
-library(leaflet)
-location.map <- crimed2017full %>% 
-  leaflet() %>%
-  addTiles() %>%
-  addMarkers(~longitude, ~latitude)
-
-print(location.map)
-
-labels <- attributes(crime11to17)$labels
-str(crime11to17$category) #Turn category into factor?
