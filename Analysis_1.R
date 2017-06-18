@@ -4,77 +4,127 @@ library(leaflet)
 library(ggplot2)
 library(lubridate)
 library(scales)
+library(rgdal)
+library(broom)
+library(classInt)
+library(KernSmooth)
+
+#Read dataset
+setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/")
+crime11to17 <- readRDS("crime11to17.rds")
+monthly.crime <- readRDS("monthlycrime.rds")
+annual.crime <- readRDS("annualcrime.rds")
+seasonal.crime <- readRDS("seasonalcrime.rds")
 
 #Initial exploration of data
 
-summary(crime.full.narrow)
-table(crime.full.narrow$crime_type)
+summary(crime11to17)
+table(crime11to17$crime_type)
 
-#15 different categories of crime
+#The most prevalent street crime in London, out of 15 categories, is anti-social behaviour
 
-asb.count <- count(crime.full.narrow, crime_type == "anti-social-behaviour")
-total.count <- nrow(crime.full.narrow)
+asb.count <- count(crime11to17, crime_type == "anti-social-behaviour")
+total.count <- nrow(crime11to17)
 print(asb.count[2,2]/total.count)
 
-#Anti-social behaviour accounts for 24.8% of observations.
+#It makes up 23.1% of recorded crime
 
-service.count <- count(crime.full.narrow, service == "BTP")
+#The majority of the records are from the Police Force but a small portion is submitted by the British Transport Police who operate on the railways
+service.count <- count(crime11to17, service == "BTP")
 print(service.count[2,2]/total.count)
+#These records account for only 4.3%
 
-#British Transport Police observations account for only 3.9%.
+#Investigation of the annual variation in street crimes by plotting a scatter graph with geom_smooth  
+total.year <- crime11to17 %>% 
+  group_by(year) %>%
+  summarize(Count=n())
 
-crime.by.year <- as.data.frame(tbl_df(table(crime.full.narrow$year)))
-crime.by.year <- rename(crime.by.year, year = Var1)
-#2017 is only reporting three months of the year, remove 2017 from table
-crime.by.year <- filter(crime.by.year, year < 2017)
+ann.crime.plot <- ggplot(annual.crime, aes(x = year, y = Count)) +
+  geom_point(aes(col = crime_type)) +
+  geom_line(aes(col = crime_type)) +
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = "black"))
 
-ggplot(crime.by.year, aes(x = year, y = n)) +
-  geom_point()
+print(ann.crime.plot)
 
-#Plot bar plot as discrete x variabkle
+ann.crime.plot <- ann.crime.plot +   
+  geom_point(total.year, aes(x = year, y = Count, col = "black")) #How do I add additional dataset?
+  
+#Three categories have shown a strong decrease between 2011 and 2017 - other-crime, other-theft and anti-social-behaviour 
+#Background of continuously decreasing reported street crimes 
+#The anonymously large drop between 2012 and 2013 may suggest a change in recording/reporting
 
-ggplot(crime.by.year, aes(x = year, fill = n)) +
-  geom_bar()
+ggplot(annual.crime) +
+  geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_type)) +
+  theme(panel.grid = element_blank())
 
+#Use Leaflet to visualise location of specific crime.
+#Reduced dataset required due to processing capability, limited to around three months of data.
 
-#Total recorded crimes decreased between 2011 and 2015, beginning to increase again in 2016.
+VC.2016 <- crime11to17 %>%
+filter(year == 2016, crime_type == 'vehicle-crime')
 
-location.map <- crime2017full %>% 
+VT.2016 %>% 
   leaflet() %>%
   addTiles() %>%
   addMarkers(~longitude, ~latitude)
 
-crime2017burg <- filter(crime2017full, category == "burglary")
 
-location.map.burglaries <- crime2017burg %>% 
-  leaflet() %>%
-  addTiles() %>%
-  addMarkers(~longitude, ~latitude)
+#Investigation of the monthly variation in street crimes
+ggplot(monthly.crime) +
+  geom_bar(stat="identity",aes(x = month,y = Count,fill = crime_type)) +
+  facet_grid(year~.)
 
-print(location.map.burglaries)
-
-#Plotting annual crime numbers for 5 most prevalent crimes
-
-ann.cri.plot <- ggplot(annual.crime, aes(x = year, y = n, col = crime_type)) +
-  geom_line(aes(group = crime_type)) +
-  theme(panel.grid = element_blank(), axis.line = element_line(colour = "black")) +
-  scale_x_discrete(name = "Year")
-
-print(ann.cri.plot)
-
-ann.cri.plot.2 <- ggplot(annual.crime, aes(x = year, fill = n)) +
-  geom_bar(position = "dodge")
-
-print(ann.cri.plot.2)
-
-#Plotting monthly crime numbers for 5 most prevalent crimes
-mon.cri.plot <- ggplot(monthly.crime, aes(x = date, y = n, col = crime_type)) +
-  geom_line(aes(group = crime_type)) +
+ggplot(monthly.crime) +
+  geom_point(aes(x = month, y = Count, col = crime_type)) +
+  facet_grid(year~.) +
   theme(panel.grid = element_blank(), axis.line = element_line(colour = "black")) +
   xlab("Month") +
-  ylab("Count") +
-  scale_x_date(breaks=data_breaks("6 months"), labels=date_format ("%Y-%m"))
+  ylab("Count") 
 
-print(mon.cri.plot)
+#Neither of these visualisations make for simple interpretation
+#It appears anti social behaviour is usually more prevalent in the summer months
+#Line graph with log10 scale for y axis
+ggplot(monthly.crime, aes(x = month, y = Count), log = "y") +
+  geom_line(aes(group = crime_type, col = crime_type)) +
+  scale_y_log10() +
+  facet_grid(year~.) 
 
-#Plotting seasonal crime numbers for 5 most prevalent crimes
+
+##########DHIRAJ CODE#########
+#Bicycle Thefts
+bike <- crime11to17 %>%
+  filter(crime_type == 'bicycle-theft')
+
+#Add jitter in lat long
+for(i in 1:length(bike$latitude)){
+  bike$longitude[i] <- bike$longitude[i]+runif(1,0.001,0.004)
+  bike$latitude[i] <- bike$latitude[i]+runif(1,0.001,0.004)}
+
+leaflet(bike) %>%
+  addTiles() %>% 
+  addCircles(~longitude,~latitude)
+
+#Heatmap by month
+ggplot(monthly.crime,aes(x=crime_type,y=month,fill=Count))+
+  geom_tile(aes(fill=Count))
+
+#Heatmap
+latlong <- select(bike, longitude, latitude)
+kde <- bkde2D(latlong,
+              bandwidth=c(.0055, .0048), gridsize = c(75,75))
+CL <- contourLines(kde$x1 , kde$x2 , kde$fhat)
+## EXTRACT CONTOUR LINE LEVELS
+LEVS <- as.factor(sapply(CL, `[[`, "level"))
+NLEV <- length(levels(LEVS))
+
+## CONVERT CONTOUR LINES TO POLYGONS
+library(sp)
+pgons <- lapply(1:length(CL), function(i)
+  Polygons(list(Polygon(cbind(CL[[i]]$x, CL[[i]]$y))), ID=i))
+spgons = SpatialPolygons(pgons)
+leaflet(spgons) %>% addTiles() %>%
+  addPolygons(color = heat.colors(NLEV, NULL)[LEVS]) #%>%
+# addCircles(lng = latlong$longitude, lat = latlong$latitude,
+#            radius = .5, opacity = .2, col = "blue")
+
+#The heat map shows a concetration of crimes in Covent Garden and on South Bank.
