@@ -120,7 +120,7 @@ Plotting a time series using geom\_bar() suggests anti-social behaviour peaks ea
 
 ![](Exploratory_Data_Analysis_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
-The anti-social behaviour will be analysed separately to determine patterns. Seasonal colours are set using a vector so the line segments can be individually coloured. Date is converted for time series use. A line plot is created withe vertical lines to indicate the beginning of each year. The day with the highest temperature of the year in London is saved as dataframe hottest.day.
+The anti-social behaviour will be analysed separately to determine patterns. Seasonal colours are set using a vector so the line segments can be individually coloured. Date is converted for time series use. A line plot is created with vertical lines to indicate the beginning of each year (black lines) and the day with the highest temperature (red lines). Dataframe hottest.day created with maximum temperature for each year.
 
 ``` r
 season.cols <- c("Summer" = "orange", "Autumn" = "darkgreen", "Winter" = "darkblue", "Spring" = "purple")
