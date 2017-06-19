@@ -40,7 +40,7 @@ asb.count <- count(crime11to17, crime_type == "anti-social-behaviour")
 total.count <- nrow(crime11to17)
 ```
 
-This accounts for % of total recorded crime.
+This accounts for 23.1421019% of total recorded crime.
 
 The majority of the records are from the Police Force but a small portion is submitted by the British Transport Police who operate on the railways.
 
@@ -48,7 +48,7 @@ The majority of the records are from the Police Force but a small portion is sub
 service.count <- count(crime11to17, service == "BTP")
 ```
 
-These records account for only %.
+These records account for only 0.0428275%.
 
 Annual Crime Analysis
 =====================
@@ -88,7 +88,7 @@ The abbreviations used are as follows:
 | VEC          | Vehicle crime           |
 | VIC          | Violent crime           |
 
-Recorded annual street crime has been decreasing each year in London since 2011. There was a significant decrease between 2012 and 2013 of 0.1182384\*100'% and subsequent years show a steadier reduction.
+Recorded annual street crime has been decreasing each year in London since 2011. There was a significant decrease between 2012 and 2013 of 11.8238381% and subsequent years show a steadier reduction.
 
 The variation of specific crime frequency over time is displayed using a bar chart and a line plot.
 
@@ -164,10 +164,10 @@ This format of displaying crime occurences is not particularly useful when the d
 Insights, correlations and further investigations
 =================================================
 
-There certainly appears to be seasonal patterns in crime occurence, as evidenced by peaks of anti social behaviour correlating to highest temperatures.
+Crime rates have been dropping consistently in London from 2011 onwards. However, certain crimes have shown an increase over that time e.g. violent crime. There are seasonal patterns in crime occurence present, as evidenced by peaks of anti-social behaviour correlating to the summer season.
 
-It is difficult at present to integrate other datasets relating to indicators at a Borough level as the data is downloaded over a polygon area of central London which encompasses parts of Westminster, Camden, Lambeth and Southwark.
+It is difficult at present to integrate other datasets relating to indicators at a Borough level as the data is downloaded using the API over a polygon area of central London which encompasses parts of Westminster, Camden, Lambeth and Southwark.
 
 The dataset would be too large if all data for the London boroughs was used for analysis. It is proposed to use shapefiles of the borough outlines to sort the data to include only the 'inner' London boroughs. This would allow investigation into correlations between areas, crimes plus other factors if time permits.
 
-In terms of hotspots for crime, the next step is to build heatmaps which show where the highest concentration of crimes occur. Each map will focus on a specific crime and be colour coded to indicate risk. Chloropleth maps could also be useful to interactively display the crime data.
+In terms of hotspots for crime, the next step is to build heatmaps which show where the highest concentration of crimes occur. Each map will focus on a specific crime and be colour coded to indicate risk. Chloropleth maps could also be useful to interactively display the frequency of specific crimes across boroughs.
