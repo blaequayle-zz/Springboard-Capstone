@@ -1,5 +1,6 @@
 #Load required library packages
 library(readr)
+library(dplyr)
 library(leaflet)
 library(ggplot2)
 library(lubridate)
@@ -8,6 +9,7 @@ library(rgdal)
 library(broom)
 library(classInt)
 library(KernSmooth)
+library(RColorBrewer)
 
 #Read dataset
 setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/")
@@ -16,7 +18,7 @@ monthly.crime <- readRDS("monthlycrime.rds")
 annual.crime <- readRDS("annualcrime.rds")
 seasonal.crime <- readRDS("seasonalcrime.rds")
 
-#Initial exploration of data
+#Look at a broad overview of the dataset.
 
 summary(crime11to17)
 table(crime11to17$crime_type)
@@ -25,7 +27,7 @@ table(crime11to17$crime_type)
 
 asb.count <- count(crime11to17, crime_type == "anti-social-behaviour")
 total.count <- nrow(crime11to17)
-print(asb.count[2,2]/total.count)
+print((asb.count[2,2]/total.count)*100)
 
 #It makes up 23.1% of recorded crime
 
@@ -34,60 +36,123 @@ service.count <- count(crime11to17, service == "BTP")
 print(service.count[2,2]/total.count)
 #These records account for only 4.3%
 
-#Investigation of the annual variation in street crimes by plotting a scatter graph with geom_smooth  
+#Investigation of the annual variation in street crimes by plotting a bar chart and scatter graphs
 total.year <- crime11to17 %>% 
   group_by(year) %>%
-  summarize(Count=n())
+  summarize(Count=n()) %>%
+  filter(year != 2017) %>%
+  as.data.frame()
+
+total.year.plot <- ggplot(total.year, aes(x = year, y = Count)) +
+  geom_col(col = "blue")
+print(total.year.plot)
+
+ann.crime.bchart <- ggplot(annual.crime) +
+  geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_abb)) +
+  theme(panel.grid = element_blank())
+print(ann.crime.bchart)
+
+#Percentage decrease between 2012 and 2013
+((total.year[2,2]-total.year[3,2])/total.year[2,2])*100
 
 ann.crime.plot <- ggplot(annual.crime, aes(x = year, y = Count)) +
-  geom_point(aes(col = crime_type)) +
-  geom_line(aes(col = crime_type)) +
+  geom_point(aes(col = crime_abb)) +
+  geom_line(aes(col = crime_abb)) +
   theme(panel.grid = element_blank(), axis.line = element_line(colour = "black"))
 
-print(ann.crime.plot)
+print(ann.crime.splot)
 
 ann.crime.plot <- ann.crime.plot +   
-  geom_point(total.year, aes(x = year, y = Count, col = "black")) #How do I add additional dataset?
+  geom_point(data = total.year, col = "black") #The scales are too different for this to be useful.
   
-#Three categories have shown a strong decrease between 2011 and 2017 - other-crime, other-theft and anti-social-behaviour 
+#Three categories have shown a strong decrease between 2011 and 2016 - other-crime, other-theft and anti-social-behaviour 
 #Background of continuously decreasing reported street crimes 
 #The anonymously large drop between 2012 and 2013 may suggest a change in recording/reporting
 
-ggplot(annual.crime) +
-  geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_type)) +
-  theme(panel.grid = element_blank())
+#Investigation of the monthly to seasonal variation in street crimes
+
+#First, need to set up a date column with the correct format using Lubridate
+monthly.crime <- monthly.crime %>% 
+  unite(date, month, year, sep = "-", remove = FALSE)
+monthly.crime$date <- paste0("01-", monthly.crime$date) 
+monthly.crime$date <- dmy(monthly.crime$date)
+
+#The colours are difficult to make out so create a colour scale which is more effective.
+#Vector also created to use for vertical markers on plots, indicating start of year.
+
+crime.col <- c("ASB" = "sienna", "BT" = "red3", "BU" = "orange", "CDA" = "yellow", "DR" = "lightgreen", "OC" = "limegreen", "OT" = "green", "PDW" = "olivedrab", "PO" = "royalblue", "PoW" = "lightblue", "RO" = "aquamarine", "SL" = "lightpink", "TP" = "violet", "VEC" = "deeppink", "VIC" = "grey")
+season.cols <- c("Summer" = "orange", "Autumn" = "darkgreen", "Winter" = "darkblue", "Spring" = "purple")
+annual.line <- c("2012-01-01", "2013-01-01", "2014-01-01", "2015-01-01", "2016-01-01", "2017-01-01")
+
+TDates <- c("2011-06-27", "2012-08-19", "2013-07-22", "2014-07-18", "2015-07-01", "2016-07-19")
+HTemp <- c(30, 30, 33, 30, 35, 33)
+hottest.day <- data.frame(x = TDates, y = HTemp)
+
+ggplot(monthly.crime, aes(x = date,  y = Count, fill = crime_abb)) +
+  geom_area() +
+  scale_fill_manual(values = crime.col) +
+  geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4)
+
+ggplot(monthly.crime) +
+  geom_bar(stat="identity",aes(x = date, y = Count,fill = crime_abb)) +
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = "black")) +
+  xlab("Date") +
+  ylab("Count") +
+  scale_fill_manual(values = crime.col)
+
+#Anti-social behaviour appears to display peaks each summer, but due to the scale used it is difficult to tell.
+#Break out anti-social behaviour to analyse peaks.
+
+seasonal.crime$date <- paste0("01-", seasonal.crime$date) 
+seasonal.crime$date <- dmy(seasonal.crime$date)
+ASB.season <- filter(seasonal.crime, crime_type == "anti-social-behaviour")
+
+ggplot(ASB.season, aes(x = date, y = Count)) +
+  geom_line(aes(group = crime_type, col = season)) + 
+  scale_colour_manual(values = season.cols) +
+  scale_x_date(date_breaks = "6 month", date_labels = "%m-%y") +
+  ylab("Number of crimes") +
+  xlab("Date") +
+  ggtitle("Anti-Social Behaviour Time Series") +
+  theme(axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
+  geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4) +
+  geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
+
+
+#There has been a clear decrease in anti-social behavious over time, with the exception of 2016 which showed a significant increase.
+#Clear peaks are visible in the summer (orange segments), often falling in August (school summer holidays).
+#The peaks frequently coincide very closely to the hottest day of the year, with the exception of 2014.
+#Minimum occurences are consistently just after New Year.
+
+#Repeat process for burglary
+
+BU.season <- filter(seasonal.crime, crime_type == "burglary")
+
+ggplot(BU.season, aes(x = date, y = Count)) +
+  geom_line(aes(group = crime_type, col = season)) + 
+  scale_colour_manual(values = season.cols) +
+  scale_x_date(date_breaks = "6 month", date_labels = "%m-%y") +
+  ylab("Number of crimes") +
+  xlab("Date") +
+  ggtitle("Burglary Time Series") +
+  theme(axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
+  geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4) +
+  geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
+  
+#There is less of a pattern visible in burglary occurences, though there is frequently a peak in the run up to Christmas.
 
 #Use Leaflet to visualise location of specific crime.
 #Reduced dataset required due to processing capability, limited to around three months of data.
 
-VC.2016 <- crime11to17 %>%
+VEC.2016 <- crime11to17 %>%
 filter(year == 2016, crime_type == 'vehicle-crime')
 
-VT.2016 %>% 
+VEC.2016 %>% 
   leaflet() %>%
   addTiles() %>%
   addMarkers(~longitude, ~latitude)
 
 
-#Investigation of the monthly variation in street crimes
-ggplot(monthly.crime) +
-  geom_bar(stat="identity",aes(x = month,y = Count,fill = crime_type)) +
-  facet_grid(year~.)
-
-ggplot(monthly.crime) +
-  geom_point(aes(x = month, y = Count, col = crime_type)) +
-  facet_grid(year~.) +
-  theme(panel.grid = element_blank(), axis.line = element_line(colour = "black")) +
-  xlab("Month") +
-  ylab("Count") 
-
-#Neither of these visualisations make for simple interpretation
-#It appears anti social behaviour is usually more prevalent in the summer months
-#Line graph with log10 scale for y axis
-ggplot(monthly.crime, aes(x = month, y = Count), log = "y") +
-  geom_line(aes(group = crime_type, col = crime_type)) +
-  scale_y_log10() +
-  facet_grid(year~.) 
 
 
 ##########DHIRAJ CODE#########
