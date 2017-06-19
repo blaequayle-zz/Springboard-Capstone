@@ -136,7 +136,7 @@ hottest.day <- data.frame(x = TDates, y = HTemp)
 
 ![](Exploratory_Data_Analysis_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
-There has been a clear decrease in anti-social behavious over time, with the exception of 2016 which showed a significant increase. Clear peaks are visible in the summer (orange segments), often falling in August (school summer holidays). The peaks frequently coincide very closely to the hottest day of the year, with the exception of 2014. Minimum occurences are consistently just after 1st January.
+There has been a clear decrease in anti-social behavious over time, with the exception of 2016 which showed a significant increase. Clear peaks are visible in the summer (orange segments), often coinciding with August when the school summer holidays occur. The peaks frequently coincide very closely to the hottest day of the year, with the exception of 2014. Minimum occurences are consistently just after 1st January.
 
 This process will be repeated for burglaries.
 
