@@ -40,7 +40,7 @@ asb.count <- count(crime11to17, crime_type == "anti-social-behaviour")
 total.count <- nrow(crime11to17)
 ```
 
-This accounts for 23.1421019% of total recorded crime.
+This accounts for 23.14% of total recorded crime.
 
 The majority of the records are from the Police Force but a small portion is submitted by the British Transport Police who operate on the railways.
 
@@ -48,7 +48,7 @@ The majority of the records are from the Police Force but a small portion is sub
 service.count <- count(crime11to17, service == "BTP")
 ```
 
-These records account for only 0.0428275%.
+These records account for only 0.04%.
 
 Annual Crime Analysis
 =====================
@@ -88,7 +88,7 @@ The abbreviations used are as follows:
 | VEC          | Vehicle crime           |
 | VIC          | Violent crime           |
 
-Recorded annual street crime has been decreasing each year in London since 2011. There was a significant decrease between 2012 and 2013 of 11.8238381% and subsequent years show a steadier reduction.
+Recorded annual street crime has been decreasing each year in London since 2011. There was a significant decrease between 2012 and 2013 of 11.82% and subsequent years show a steadier reduction.
 
 The variation of specific crime frequency over time is displayed using a bar chart and a line plot.
 
