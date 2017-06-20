@@ -1,17 +1,15 @@
 Capstone Milestone Report
-=========================
+-------------------------
 
-1. Introduction
----------------
+### 1. Introduction
 
 The Metropolitan Police operate across 32 boroughs within Greater London and aim to make London the safest global city. To this end, an accessible method allowing both residents and tourists to check where crime hotspots are located would allow them to make informed decisions about where they go and encourage preventative action. This would be a useful service for the Met Police to promote with the aim of reducing opportunistic crimes by raising awareness of the highest risk areas.
 
 For locals, this may be in the context of checking incidences of bicycle theft to identify where is best to lock up your bike, or hotspots for burglaries when looking to rent or purchase property. This may also be useful for tourists visiting the city to flag if they are in a higher risk area.
 
-This project aims to address several key questions: 1.Is crime on the increase or decrease in central London? 2.Is the frequency of specific crimes reducing or increasing on an annual basis? 3.Is there any seasonal variation in the frequency of crimes? 4.Are certain crimes more prevalent in certain areas - where are these 'hotspots'? 5.Create a visualisation allowing easy identification of risk level to a certain crime 6.Can correlations be made between crime occurrences and other indicators e.g. employment levels? 7. Can time series forecasting be used to estimate occurence of crime in the future?
+This project aims to address several key questions: 1. Is crime on the increase or decrease in central London? 2. Is the frequency of specific crimes reducing or increasing on an annual basis? 3. Is there any seasonal variation in the frequency of crimes? 4. Are certain crimes more prevalent in certain areas - where are these 'hotspots'? 5. Create a visualisation allowing easy identification of risk level to a certain crime 6. Can correlations be made between crime occurrences and other indicators e.g. employment levels? 7. Can time series forecasting be used to estimate occurence of crime in the future?
 
-2. Data acquisition
--------------------
+### 2. Data acquisition
 
 Datasets for street level crime in England, Wales and Northern Ireland are available at (<https://data.police.uk/docs/method/crime-street/>). Data is reported monthly and is available from December 2010 to March 2017 at present. All the data on this site is made available under the Open Government License v3.0.
 
@@ -29,8 +27,7 @@ Location data is only referencing the approximate location using 'anonymous' map
 
 The API will initially be used to acquire the full dataset from December 2011 to March 2017 for central London as defined by a coordinates box with corners: 51.514,-0.225 51.484,-0.225 51.484,-0.105 51.514,-0.105
 
-3. Important fields and information
------------------------------------
+### 3. Important fields and information
 
 Variable names, types and number of observations were reviewed using glimpse(crime11to17). This reveals there are 11 variables - 6 characters, 3 numerics (1 integer, 2 double precision) and 2 factors. There are 498,628 observations in total.
 
@@ -38,13 +35,11 @@ The following variables are returned: **category**, location\_type, context, per
 
 There are 15 different types of crime (variable category). Month and year are available but not day due to the police anonymisation process. Latitude and longitude are provided. Location data is only referencing the approximate location using 'anonymous' map points.
 
-4.Data limitations
-------------------
+### 4. Data limitations
 
 The main limitations that have been identified with the dataset are: \* Anonymistation of the data means the locations are fixed to a 'map point' and jittering is required to make all the events visible, although as the dataset gets larger it is not possible to create an effective map visualisation of individual crimes. \* Anonymisation also means no day/time is provided so it is not possible to analyse potential relationships with certain crimes. \* It is difficult at present to integrate other datasets relating to indicators at a Borough level as the data is downloaded using the API over a polygon area of central London which encompasses parts of Westminster, Camden, Lambeth and Southwark.
 
-5. Data cleaning and wrangling
-------------------------------
+### 5. Data cleaning and wrangling
 
 The following packages were loaded in preparation for data wrangling: readr, dplyr, tidyr and lubridate.
 
@@ -66,8 +61,7 @@ They key data wrangling steps that were undertaken as part of this project were 
 
 -   Save dataframes created using saveRDS for loading into analysis section.
 
-6. Preliminary exploration
---------------------------
+### 6. Preliminary exploration
 
 The most prevalent crime in the 2011-2017 period is anti-social-behaviour. This accounts for 23% of total recorded crime. The majority of the records are from the Police Force but a small portion is submitted by the British Transport Police who operate on the railways. These records account for only 4.3%. It would be interesting to explore the annual variation in street crimes using a bar chart. The total crimes per year are calculated using group\_by(year) and summarize(Count=n()).
 
@@ -154,8 +148,7 @@ leaflet(spgons) %>% addTiles() %>%
 
 The heat map shows a concentration of bicycle thefts in Covent Garden and on the South Bank, two of the most popular tourist areas in London.
 
-7. Initial findings and impact on approach
-------------------------------------------
+### 7. Initial findings and impact on approach
 
 Crime rates have been dropping consistently in London from 2011 onwards. However, certain crimes have shown an increase over that time e.g. violent crime. There are seasonal patterns in crime present, as evidenced by peaks of anti-social behaviour correlating to the temperature peaks in the summer season. Bicycle theft is also clearly cyclical.
 
