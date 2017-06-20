@@ -10,6 +10,7 @@ library(broom)
 library(classInt)
 library(KernSmooth)
 library(RColorBrewer)
+library(sp)
 
 #Read dataset
 setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/")
@@ -43,9 +44,9 @@ total.year <- crime11to17 %>%
   filter(year != 2017) %>%
   as.data.frame()
 
-total.year.plot <- ggplot(total.year, aes(x = year, y = Count)) +
+ggplot(total.year, aes(x = year, y = Count)) +
   geom_col(col = "blue")
-print(total.year.plot)
+ggsave("total.year.png")
 
 ann.crime.bchart <- ggplot(annual.crime) +
   geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_abb)) +
@@ -55,12 +56,11 @@ print(ann.crime.bchart)
 #Percentage decrease between 2012 and 2013
 ((total.year[2,2]-total.year[3,2])/total.year[2,2])*100
 
-ann.crime.plot <- ggplot(annual.crime, aes(x = year, y = Count)) +
+ggplot(annual.crime, aes(x = year, y = Count)) +
   geom_point(aes(col = crime_abb)) +
   geom_line(aes(col = crime_abb)) +
   theme(panel.grid = element_blank(), axis.line = element_line(colour = "black"))
-
-print(ann.crime.splot)
+ggsave("annual.line.png")
 
 ann.crime.plot <- ann.crime.plot +   
   geom_point(data = total.year, col = "black") #The scales are too different for this to be useful.
@@ -92,6 +92,7 @@ ggplot(monthly.crime, aes(x = date,  y = Count, fill = crime_abb)) +
   geom_area() +
   scale_fill_manual(values = crime.col) +
   geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4)
+ggsave("annual.png")
 
 ggplot(monthly.crime) +
   geom_bar(stat="identity",aes(x = date, y = Count,fill = crime_abb)) +
@@ -99,6 +100,10 @@ ggplot(monthly.crime) +
   xlab("Date") +
   ylab("Count") +
   scale_fill_manual(values = crime.col)
+
+#Heatmap by month
+ggplot(monthly.crime,aes(x=crime_abb,y=month,fill=Count))+
+  geom_tile(aes(fill=Count))
 
 #Anti-social behaviour appears to display peaks each summer, but due to the scale used it is difficult to tell.
 #Break out anti-social behaviour to analyse peaks.
@@ -115,14 +120,28 @@ ggplot(ASB.season, aes(x = date, y = Count)) +
   xlab("Date") +
   ggtitle("Anti-Social Behaviour Time Series") +
   theme(axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
-  geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4) +
   geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
-
+ggsave("asb.png")
 
 #There has been a clear decrease in anti-social behavious over time, with the exception of 2016 which showed a significant increase.
 #Clear peaks are visible in the summer (orange segments), often falling in August (school summer holidays).
 #The peaks frequently coincide very closely to the hottest day of the year, with the exception of 2014.
 #Minimum occurences are consistently just after New Year.
+
+#Repeat process for bicycle theft
+
+BT.season <- filter(seasonal.crime, crime_type == "bicycle-theft")
+
+ggplot(BT.season, aes(x = date, y = Count)) +
+  geom_line(aes(group = crime_type, col = season)) + 
+  scale_colour_manual(values = season.cols) +
+  scale_x_date(date_breaks = "6 month", date_labels = "%m-%y") +
+  ylab("Number of crimes") +
+  xlab("Date") +
+  ggtitle("Bicycle Theft Time Series") +
+  theme(axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
+  geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
+ggsave("bicycle-theft.png")
 
 #Repeat process for burglary
 
@@ -136,8 +155,8 @@ ggplot(BU.season, aes(x = date, y = Count)) +
   xlab("Date") +
   ggtitle("Burglary Time Series") +
   theme(axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
-  geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4) +
   geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
+ggsave("burglary.png")
   
 #There is less of a pattern visible in burglary occurences, though there is frequently a peak in the run up to Christmas.
 
@@ -153,10 +172,10 @@ VEC.2016 %>%
   addMarkers(~longitude, ~latitude)
 
 
+#Kernel Density Estimation
+#USing Bicycle Thefts initially
 
 
-##########DHIRAJ CODE#########
-#Bicycle Thefts
 bike <- crime11to17 %>%
   filter(crime_type == 'bicycle-theft')
 
@@ -169,10 +188,6 @@ leaflet(bike) %>%
   addTiles() %>% 
   addCircles(~longitude,~latitude)
 
-#Heatmap by month
-ggplot(monthly.crime,aes(x=crime_type,y=month,fill=Count))+
-  geom_tile(aes(fill=Count))
-
 #Heatmap
 latlong <- select(bike, longitude, latitude)
 kde <- bkde2D(latlong,
@@ -183,13 +198,11 @@ LEVS <- as.factor(sapply(CL, `[[`, "level"))
 NLEV <- length(levels(LEVS))
 
 ## CONVERT CONTOUR LINES TO POLYGONS
-library(sp)
+
 pgons <- lapply(1:length(CL), function(i)
   Polygons(list(Polygon(cbind(CL[[i]]$x, CL[[i]]$y))), ID=i))
 spgons = SpatialPolygons(pgons)
 leaflet(spgons) %>% addTiles() %>%
-  addPolygons(color = heat.colors(NLEV, NULL)[LEVS]) #%>%
-# addCircles(lng = latlong$longitude, lat = latlong$latitude,
-#            radius = .5, opacity = .2, col = "blue")
+  addPolygons(color = heat.colors(NLEV, NULL)[LEVS])
 
 #The heat map shows a concentration of crimes in Covent Garden and on South Bank.
