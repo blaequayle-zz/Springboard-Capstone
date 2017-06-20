@@ -7,7 +7,21 @@ The Metropolitan Police operate across 32 boroughs within Greater London and aim
 
 For locals, this may be in the context of checking incidences of bicycle theft to identify where is best to lock up your bike, or hotspots for burglaries when looking to rent or purchase property. This may also be useful for tourists visiting the city to flag if they are in a higher risk area.
 
-This project aims to address several key questions: 1. Is crime on the increase or decrease in central London? 2. Is the frequency of specific crimes reducing or increasing on an annual basis? 3. Is there any seasonal variation in the frequency of crimes? 4. Are certain crimes more prevalent in certain areas - where are these 'hotspots'? 5. Create a visualisation allowing easy identification of risk level to a certain crime 6. Can correlations be made between crime occurrences and other indicators e.g. employment levels? 7. Can time series forecasting be used to estimate occurence of crime in the future?
+This project aims to address several key questions:
+
+1.  Is crime on the increase or decrease in central London?
+
+2.  Is the frequency of specific crimes reducing or increasing on an annual basis?
+
+3.  Is there any seasonal variation in the frequency of crimes?
+
+4.  Are certain crimes more prevalent in certain areas - where are these 'hotspots'?
+
+5.  Create a visualisation allowing easy identification of risk level to a certain crime
+
+6.  Can correlations be made between crime occurrences and other indicators e.g. employment levels?
+
+7.  Can time series forecasting be used to estimate occurence of crime in the future?
 
 ### 2. Data acquisition
 
@@ -37,7 +51,13 @@ There are 15 different types of crime (variable category). Month and year are av
 
 ### 4. Data limitations
 
-The main limitations that have been identified with the dataset are: \* Anonymistation of the data means the locations are fixed to a 'map point' and jittering is required to make all the events visible, although as the dataset gets larger it is not possible to create an effective map visualisation of individual crimes. \* Anonymisation also means no day/time is provided so it is not possible to analyse potential relationships with certain crimes. \* It is difficult at present to integrate other datasets relating to indicators at a Borough level as the data is downloaded using the API over a polygon area of central London which encompasses parts of Westminster, Camden, Lambeth and Southwark.
+The main limitations that have been identified with the dataset are:
+
+-   Anonymistation of the data means the locations are fixed to a 'map point' and jittering is required to make all the events visible, although as the dataset gets larger it is not possible to create an effective map visualisation of individual crimes.
+
+-   Anonymisation also means no day/time is provided so it is not possible to analyse potential relationships with certain crimes.
+
+-   It is difficult at present to integrate other datasets relating to indicators at a Borough level as the data is downloaded using the API over a polygon area of central London which encompasses parts of Westminster, Camden, Lambeth and Southwark.
 
 ### 5. Data cleaning and wrangling
 
