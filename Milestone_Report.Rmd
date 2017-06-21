@@ -5,6 +5,7 @@ date: "6/19/2017"
 output: 
  md_document:
     variant: markdown_github
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -75,19 +76,19 @@ The main limitations that have been identified with the dataset are:
 
 ### 5. Data cleaning and wrangling
 
-The following packages were loaded in preparation for data wrangling: readr, dplyr, tidyr and lubridate.
+The following packages were loaded in preparation for data wrangling: `readr`, `dplyr`, `tidyr` and `lubridate`.
 
 They key data wrangling steps that were undertaken as part of this project were as follows:
 
-* Convert category and location_type to factor using as.factor().
+* Convert `category` and `location_type` to factor using `as.factor()`.
 
-* Several of the variables contained no useful data for a civilian user. The variables context, persistent_id, id and location_subtype were removed with select() and variable names for category and location_type were changed to crime_type and service respectively, to make the dataset clearer using rename().
+* Several of the variables contained no useful data for a civilian user. The variables `context`, `persistent_id`, `id` and `location_subtype` were removed with `select()` and variable names for `category` and `location_type` were changed to `crime_type` and `service` respectively, to make the dataset clearer using `rename()`.
 
-* Checked columns for missing values using sapply(crime11to17, function(x) sum(is.na(x))). Only the outcome_status_category and outcome_status_date contain NA values and there is no plan to use these in the scope of the current project.
+* Checked columns for missing values using `sapply(crime11to17, function(x) sum(is.na(x)))`. Only the `outcome_status_category` and `outcome_status_date` contain NA values and there is no plan to use these in the scope of the current project.
 
-* Use the lubridate functions year() and month() to create new columns called year and month from the original 'month' variable which was in format y-m.
+* Use the `lubridate` functions `year()` and `month()` to create new columns called `year` and `month` from the original 'month' variable which was in format y-m.
 
-* Create dataframe for monthly crime statistics from 2011 to 2017. Abbreviate the crime_type into new variable called crime_abb to improve data visualisations using case_when() function nested within mutate(). The 'r group_by()' function is then used to sort by year, month and crime_abb. summarize() is used to get a count for each of the new groupings.
+* Create dataframe for monthly crime statistics from 2011 to 2017. Abbreviate the `crime_type` into new variable called `crime_abb` to improve data visualisations using `case_when()` function nested within `mutate()`. The  `group_by()` function is then used to sort by `year`, `month` and `crime_abb`. `summarize()` is used to get a count for each of the new groupings.
 
 * Repeat process for annual crime statistics from 2011 to 2016, 2017 removed as only a partial year. 
 
@@ -99,7 +100,7 @@ They key data wrangling steps that were undertaken as part of this project were 
 
 The most prevalent crime in the 2011-2017 period is anti-social-behaviour. This accounts for 23% of total recorded crime. The majority of the records are from the Police Force but a small portion is submitted by the British Transport Police who operate on the railways. These records account for only 4.3%. It would be interesting to explore the annual variation in street crimes using a bar chart. The total crimes per year are calculated using group_by(year) and summarize(Count=n()).
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 library(readr)
 library(ggplot2)
 library(dplyr)
@@ -125,7 +126,7 @@ total.year <- crime11to17 %>%
 
 ```
 
-```{r, echo = FALSE}
+```{r}
 ggplot(total.year, aes(x = year, y = Count)) +
   geom_col(col = "blue")
 ```
@@ -152,13 +153,13 @@ VIC           |  Violent crime
 
 Recorded annual street crime has been decreasing each year in London since 2011. There was a significant decrease between 2012 and 2013 of 11.8% and subsequent years show a reduction with a less steep negative gradient. The variation of specific crime frequency over time is displayed using a bar chart and a line plot with the annual.crime dataframe as input.
 
-```{r, echo=FALSE}
+```{r}
 ggplot(annual.crime) +
   geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_abb)) +
   theme(panel.grid = element_blank())
 ```
 
-```{r, echo=FALSE}
+```{r}
 ggplot(annual.crime, aes(x = year, y = Count)) +
   geom_point(aes(col = crime_abb)) +
   geom_line(aes(col = crime_abb)) +
@@ -169,7 +170,7 @@ Three categories have shown a strong decrease between 2011 and 2016 - other crim
 
 The monthly.crime dataframe is used to investigate time series. Initially, the date column needs to be set to the correct format using Lubridate.
 
-```{r, echo = FALSE}
+```{r}
 monthly.crime <- monthly.crime %>% 
   unite(date, month, year, sep = "-", remove = FALSE)
 monthly.crime$date <- paste0("01-", monthly.crime$date) 
@@ -178,12 +179,12 @@ monthly.crime$date <- dmy(monthly.crime$date)
 
 A time series is plotted using geom_area() which stacks time series at each point. The colour scale for the crime categories is manually set using a vector due to the large number of categories.
 
-```{r, echo=FALSE}
+```{r}
 crime.col <- c("ASB" = "sienna", "BT" = "red3", "BU" = "orange", "CDA" = "yellow", "DR" = "lightgreen", "OC" = "limegreen", "OT" = "green", "PDW" = "olivedrab", "PO" = "royalblue", "PoW" = "lightblue", "RO" = "aquamarine", "SL" = "lightpink", "TP" = "violet", "VEC" = "deeppink", "VIC" = "grey")
 
 ```
 
-```{r, echo=FALSE}
+```{r}
 ggplot(monthly.crime, aes(x = date,  y = Count, fill = crime_abb)) +
   geom_area() +
   scale_fill_manual(values = crime.col)
@@ -193,7 +194,7 @@ This illustrates the changing classification of crimes over time and suggests th
 
 A time series is plotted using geom_bar() which suggests anti-social behaviour peaks each summer, but due to the scale used it is difficult to analyse it further.
 
-```{r, echo=FALSE}
+```{r}
 ggplot(monthly.crime) +
   geom_bar(stat="identity",aes(x = date, y = Count,fill = crime_abb)) +
   theme(panel.grid = element_blank(), axis.line = element_line(colour = "black")) +
@@ -204,7 +205,7 @@ ggplot(monthly.crime) +
 
 A heatmap can be used to analyse seasonal variation across all crime categories.
 
-```{r, echo = FALSE}
+```{r}
 ggplot(monthly.crime,aes(x=crime_abb,y=month,fill=Count))+
   geom_tile(aes(fill=Count))
 ```
@@ -213,7 +214,7 @@ This clearly demonstrates the seasonal fluctuations in anti-social behaviour, wi
 
 These variations will be analysed in more detail using the seasonal.crime dataframe. Seasonal colours are set using a vector so the line segments can be individually coloured. Date is converted for time series use. A line plot is created with vertical lines to indicate the day with the highest temperature (red lines). This is created using a dataframe with the maximum London temperature for each year (hottest.day).
 
-```{r, echo = FALSE}
+```{r}
 season.cols <- c("Summer" = "orange", "Autumn" = "darkgreen", "Winter" = "darkblue", "Spring" = "purple")
 seasonal.crime$date <- paste0("01-", seasonal.crime$date) 
 seasonal.crime$date <- dmy(seasonal.crime$date)
@@ -225,7 +226,7 @@ HTemp <- c(30, 30, 33, 30, 35, 33)
 hottest.day <- data.frame(x = TDates, y = HTemp)
 ```
 
-```{r, echo=FALSE}
+```{r}
 ggplot(ASB.season, aes(x = date, y = Count)) +
   geom_line(aes(group = crime_type, col = season)) + 
   scale_colour_manual(values = season.cols) +
@@ -239,7 +240,7 @@ ggplot(ASB.season, aes(x = date, y = Count)) +
 
 There has been a clear decrease in anti-social behaviour over time, with the exception of 2016 which showed a significant increase. Clear peaks are visible in the summer (orange segments), often coinciding with August when the school summer holidays occur. The peaks frequently coincide very closely to the hottest day of the year, with the exception of 2014. Minimum occurences are consistently just after 1st January.  This process will be repeated for bicycle theft and burglaries.
 
-```{r, echo = FALSE}
+```{r}
 BT.season <- filter(seasonal.crime, crime_type == "bicycle-theft")
 ggplot(BT.season, aes(x = date, y = Count)) +
   geom_line(aes(group = crime_type, col = season)) + 
@@ -252,7 +253,7 @@ ggplot(BT.season, aes(x = date, y = Count)) +
   geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
 ```
 
-```{r, echo=FALSE}
+```{r}
 BU.season <- filter(seasonal.crime, crime_type == "burglary")
 
 ggplot(BU.season, aes(x = date, y = Count)) +
@@ -272,7 +273,7 @@ Burglaries have generally decreased since 2012, though there was a surge in Spri
 
 The Leaflet package can be used to visualise the location of crime occurences. A reduced dataset is required and is only useful if the data is filtered to a single year and single crime, due to overlapping or proximal datapoints. Jittering could be used to improve this.
 
-```{r, eval = FALSE, echo = FALSE}
+```{r}
 VEC.2016 <- crime11to17 %>%
 filter(year == 2016, crime_type == 'vehicle-crime')
 
@@ -284,7 +285,7 @@ VEC.2016 %>%
 
 It would be valuable to be able to visualise the density of crimes rather than individual occurences. A dataframe is created from the original dataset containing only bicycle theft. Jitter is then added to the latitude and longitude. Leaflet can be used to visualise the output. An improvement is visible but it's still difficult to interpret.
 
-```{r, echo=FALSE}
+```{r}
 bike <- crime11to17 %>%
   filter(crime_type == 'bicycle-theft')
 
@@ -294,7 +295,7 @@ for(i in 1:length(bike$latitude)){
 
 ```
 
-```{r, echo = FALSE, eval = FALSE}
+```{r}
 leaflet(bike) %>%
   addTiles() %>% 
   addCircles(~longitude,~latitude)
