@@ -1,6 +1,9 @@
+#Analysis 1 is focussing on invesigating the original dataset spanning 2011-2017
+
 #Load required library packages
 library(readr)
 library(dplyr)
+library(tidyr)
 library(leaflet)
 library(ggplot2)
 library(lubridate)
@@ -48,10 +51,9 @@ ggplot(total.year, aes(x = year, y = Count)) +
   geom_col(col = "blue")
 ggsave("total.year.png")
 
-ann.crime.bchart <- ggplot(annual.crime) +
+ggplot(annual.crime) +
   geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_abb)) +
   theme(panel.grid = element_blank())
-print(ann.crime.bchart)
 
 #Percentage decrease between 2012 and 2013
 ((total.year[2,2]-total.year[3,2])/total.year[2,2])*100
@@ -62,9 +64,6 @@ ggplot(annual.crime, aes(x = year, y = Count)) +
   theme(panel.grid = element_blank(), axis.line = element_line(colour = "black"))
 ggsave("annual.line.png")
 
-ann.crime.plot <- ann.crime.plot +   
-  geom_point(data = total.year, col = "black") #The scales are too different for this to be useful.
-  
 #Three categories have shown a strong decrease between 2011 and 2016 - other-crime, other-theft and anti-social-behaviour 
 #Background of continuously decreasing reported street crimes 
 #The anonymously large drop between 2012 and 2013 may suggest a change in recording/reporting
@@ -101,9 +100,10 @@ ggplot(monthly.crime) +
   ylab("Count") +
   scale_fill_manual(values = crime.col)
 
-#Heatmap by month
+#Heatmap can be used to identify seasonal trends
 ggplot(monthly.crime,aes(x=crime_abb,y=month,fill=Count))+
-  geom_tile(aes(fill=Count))
+  geom_tile(aes(fill=Count)) +
+  ggtitle("Crime Heatmap - Seasonal Trends")
 
 #Anti-social behaviour appears to display peaks each summer, but due to the scale used it is difficult to tell.
 #Break out anti-social behaviour to analyse peaks.
@@ -123,12 +123,12 @@ ggplot(ASB.season, aes(x = date, y = Count)) +
   geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
 ggsave("asb.png")
 
-#There has been a clear decrease in anti-social behavious over time, with the exception of 2016 which showed a significant increase.
+#There has been a clear decrease in anti-social behaviour over time, with the exception of 2016 which showed a significant increase.
 #Clear peaks are visible in the summer (orange segments), often falling in August (school summer holidays).
 #The peaks frequently coincide very closely to the hottest day of the year, with the exception of 2014.
 #Minimum occurences are consistently just after New Year.
 
-#Repeat process for bicycle theft
+#Repeat this seasonal analysis for bicycle theft
 
 BT.season <- filter(seasonal.crime, crime_type == "bicycle-theft")
 
@@ -143,7 +143,7 @@ ggplot(BT.season, aes(x = date, y = Count)) +
   geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
 ggsave("bicycle-theft.png")
 
-#Repeat process for burglary
+#Repeat this seasonal analysis for burglary
 
 BU.season <- filter(seasonal.crime, crime_type == "burglary")
 
@@ -163,6 +163,7 @@ ggsave("burglary.png")
 #Use Leaflet to visualise location of specific crime.
 #Reduced dataset required due to processing capability, limited to around three months of data.
 
+
 VEC.2016 <- crime11to17 %>%
 filter(year == 2016, crime_type == 'vehicle-crime')
 
@@ -171,38 +172,5 @@ VEC.2016 %>%
   addTiles() %>%
   addMarkers(~longitude, ~latitude)
 
-
-#Kernel Density Estimation
-#USing Bicycle Thefts initially
-
-
-bike <- crime11to17 %>%
-  filter(crime_type == 'bicycle-theft')
-
-#Add jitter in lat long
-for(i in 1:length(bike$latitude)){
-  bike$longitude[i] <- bike$longitude[i]+runif(1,0.001,0.004)
-  bike$latitude[i] <- bike$latitude[i]+runif(1,0.001,0.004)}
-
-leaflet(bike) %>%
-  addTiles() %>% 
-  addCircles(~longitude,~latitude)
-
-#Heatmap
-latlong <- select(bike, longitude, latitude)
-kde <- bkde2D(latlong,
-              bandwidth=c(.0055, .0048), gridsize = c(75,75))
-CL <- contourLines(kde$x1 , kde$x2 , kde$fhat)
-## EXTRACT CONTOUR LINE LEVELS
-LEVS <- as.factor(sapply(CL, `[[`, "level"))
-NLEV <- length(levels(LEVS))
-
-## CONVERT CONTOUR LINES TO POLYGONS
-
-pgons <- lapply(1:length(CL), function(i)
-  Polygons(list(Polygon(cbind(CL[[i]]$x, CL[[i]]$y))), ID=i))
-spgons = SpatialPolygons(pgons)
-leaflet(spgons) %>% addTiles() %>%
-  addPolygons(color = heat.colors(NLEV, NULL)[LEVS])
-
-#The heat map shows a concentration of crimes in Covent Garden and on South Bank.
+#Just displaying the crime locations not particularly useful, either a KDE map showing areas
+#of high density street crime or a chloropleth map giving an indication per borough would be useful.
