@@ -710,7 +710,7 @@ If data download constraints were not an issue, a larger dataset covering all of
 
 The client focus was threefold for this project, the local residents, the tourists and the Met Police. There are several recommendations which can be made as a result of the work carried out:
 
-1. A combination of interactive chloropleth and KDE maps could be used to populate a Shiney App for easy access on a smartphone or tablet. The Met Police could make this publicly available to encourage both residents and tourists to check crime hotspots. This would support their aim of making London the safest global city and puts data directly into the hands of the general public, allowing them to take informed decisions.
+1. A combination of interactive chloropleth and KDE maps could be used to populate a Shiny App for easy access on a smartphone or tablet. The Met Police could make this publicly available to encourage both residents and tourists to check crime hotspots. This would support their aim of making London the safest global city and puts data directly into the hands of the general public, allowing them to take informed decisions.
 
 2. For tourists, always be on high alert for pickpockets when visiting tourist attractions in Westminster, especially the areas around Soho and Covent Garden, and when visiting Shoreditch.
 

@@ -147,7 +147,7 @@ borough.col <- c("Camden" = "red3", "Greenwich" = "orange", "Hackney" = "yellow"
 ggplot(crime.borough.norm) +
   geom_bar(stat="identity",aes(x = borough, y = norm, fill = crime_type)) +
   theme(panel.grid = element_blank(), axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
-  ggtitle("Normalised Crime Breakdown") +
+  ggtitle("Types of Crime by Borough (Normalised)") +
   ylab("Crime occurence per 100 people") +
   xlab("Borough") 
 
@@ -155,10 +155,11 @@ ggplot(crime.borough.norm, aes(x = crime_type, y = norm)) +
   geom_point(aes(col = borough)) +
   geom_line(aes(col = borough, group = borough)) +
   xlab("Crime type") +
-  ylab("Crime occurence per 100 people") +
-  ggtitle("Normalised Crime Breakdown") +
+  ylab("Crime occurences per 100 people") +
+  ggtitle("Types of Crime by Borough (Normalised)") +
   scale_colour_manual(values = borough.col) +
-  theme(panel.grid = element_blank(), axis.line = element_line(colour = "black"), axis.text.x=element_text(angle=60, hjust=1))
+  theme(panel.grid = element_blank(), axis.line = element_line(colour = "black"), axis.text.x=element_text(angle=60, hjust=1)) +
+  ggsave("crimetype.norm.png")
 
 #Relative to its population, Wesminster has even more crimes per 100 residents. 
 #This does take the large number of tourists who visit the borough every day into account.

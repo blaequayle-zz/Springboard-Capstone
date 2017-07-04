@@ -48,12 +48,19 @@ total.year <- crime11to17 %>%
   as.data.frame()
 
 ggplot(total.year, aes(x = year, y = Count)) +
-  geom_col(col = "blue")
+  geom_col(col = "blue", fill = "lightgrey") + 
+  ggtitle("Annual variation in street crime occurence (2011-2016)") +
+  xlab("Year") +
+  ylab("Number of crimes")
 ggsave("total.year.png")
 
 ggplot(annual.crime) +
   geom_bar(stat="identity",aes(x = year, y = Count,fill = crime_abb)) +
-  theme(panel.grid = element_blank())
+  theme(panel.grid = element_blank()) +
+  ggtitle("Annual variation in crime type") +
+  xlab("Year") +
+  ylab("Number of crimes")
+ggsave("annual.crime.png")
 
 #Percentage decrease between 2012 and 2013
 ((total.year[2,2]-total.year[3,2])/total.year[2,2])*100
@@ -90,14 +97,16 @@ hottest.day <- data.frame(x = TDates, y = HTemp)
 ggplot(monthly.crime, aes(x = date,  y = Count, fill = crime_abb)) +
   geom_area() +
   scale_fill_manual(values = crime.col) +
-  geom_vline(xintercept = as.numeric(as.Date(annual.line)), linetype=4)
+  ggtitle("Annual variation in street crime occurence (2011-2017)") +
+  xlab("Year") +
+  ylab("Number of crimes")
 ggsave("annual.png")
 
 ggplot(monthly.crime) +
   geom_bar(stat="identity",aes(x = date, y = Count,fill = crime_abb)) +
   theme(panel.grid = element_blank(), axis.line = element_line(colour = "black")) +
   xlab("Date") +
-  ylab("Count") +
+  ylab("Number of crimes") +
   scale_fill_manual(values = crime.col)
 
 #Heatmap can be used to identify seasonal trends
@@ -118,7 +127,7 @@ ggplot(ASB.season, aes(x = date, y = Count)) +
   scale_x_date(date_breaks = "6 month", date_labels = "%m-%y") +
   ylab("Number of crimes") +
   xlab("Date") +
-  ggtitle("Anti-Social Behaviour Time Series") +
+  ggtitle("Anti-Social Behaviour 2011 - 2017") +
   theme(axis.text.x=element_text(angle=60, hjust=1), plot.title = element_text(lineheight=.8, face="bold")) +
   geom_vline(xintercept = as.numeric(as.Date(TDates)), linetype=2, col = "red")
 ggsave("asb.png")
