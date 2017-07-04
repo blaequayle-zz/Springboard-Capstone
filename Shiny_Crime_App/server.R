@@ -72,7 +72,7 @@ shinyServer(function(input, output) {
                     longitude>=(clng-0.0089/cos(clat*0.018))&longitude<=(clng+0.0089/cos(clat*0.018))))
     leafletProxy("safetymap") %>% # use the proxy to save computation
       addCircles(lng=clng, lat=clat, group='circles',
-                 weight=1, radius=dist, color='black', fillColor=ifelse(thefts<100,'green',ifelse(thefts>=100&thefts<500,'orange', ifelse(thefts>500, 'red'))),
+                 weight=1, radius=1000, color='black', fillColor=ifelse(thefts<200,'green',ifelse(thefts>=200&thefts<400,'orange', ifelse(thefts>=400, 'red'))),
                  fillOpacity=0.5, opacity=1,
                  popup = paste("No. of bicycle thefts: ", thefts))
   })

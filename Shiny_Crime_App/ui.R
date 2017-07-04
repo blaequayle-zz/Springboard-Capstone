@@ -42,11 +42,11 @@ shinyUI(navbarPage(title=div(img(src="skyline.png", width="27%", align = "right"
                                 h2("Click On Map to Get Safety Zone"),
                                 
                                 p("The app calculates the number of bicycle thefts that have taken place in a radius of 1 Km from 
-                                  the point that has been clicked on the map. If the number is less than 10, the circle is coloured green.
-                                  Between 10 to 50 thefts, the circle is rendered in orange colour and beyond 50, the colour of the circle is red.
+                                  the point that has been clicked on the map. If less than 200 thefts have occurred the circle is green.
+                                  Between 200 and 400 thefts, the circle is coloured orange and beyond 400, the circle is red.
                                   The Met Police can encourage the users of this app to be aware of where they choose to lock their bikes."),
                                 actionButton("button","Clear Circles"),
-                                leafletOutput("safetymap", click = "safetymap_click", width = "100%",height=800)
+                                leafletOutput("safetymap", width = "100%",height=800)
                               )
                    )
                    
