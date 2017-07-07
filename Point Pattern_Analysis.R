@@ -18,6 +18,7 @@ mollweide <- "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units
 crime16 <- readRDS('crime16.rds')
 coords <- SpatialPoints(crime16[,c("longitude","latitude")])
 crime16 <- SpatialPointsDataFrame(coords, crime16)
+proj4string(crime16) <- CRS(mollweide)
 crime16 <- spTransform(crime16, CRS(mollweide))
 
 setwd("/Users/Blae/Documents/Work/Data Science/gis_boundaries/ESRI/")
@@ -142,9 +143,6 @@ barplot(Local.Intensity[order(Local.Intensity[,2]),2],names.arg=Local.Intensity[
 plot(density.ppp(Drugs.ppp, sigma = bw.diggle(Drugs.ppp),edge=T),main=paste("h =",round(bw.diggle(Drugs.ppp),2)))
 plot(density.ppp(Drugs.ppp, sigma = bw.ppl(Drugs.ppp),edge=T),main=paste("h =",round(bw.ppl(Drugs.ppp),2)))
 plot(density.ppp(Drugs.ppp, sigma = bw.scott(Drugs.ppp)[2],edge=T),main=paste("h =",round(bw.scott(Drugs.ppp)[2],2)))
-<<<<<<< HEAD
-plot(density.ppp(Drugs.ppp, sigma = bw.scott(Drugs.ppp)[1],edge=T),main=paste("h =",round(bw.scott(Drugs.ppp)[1],2)))
-=======
 plot(density.ppp(Drugs.ppp, sigma = bw.scott(Drugs.ppp)[1],edge=T),main=paste("h =",round(bw.scott(Drugs.ppp)[1],2)))
 
->>>>>>> f28242b947b301c14a7f5f9c9ed5be2d1a8a6105
+
