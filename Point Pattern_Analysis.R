@@ -70,6 +70,8 @@ proj4string(crime16) #SpatialPoints DataFrame
 proj4string(central) #SpatialPolygons DataFrame
 central <- spTransform(central, CRS("+init=epsg:4326"))
 
+##There's an issue with the the CRS I think.... I have tried switching so they are both the same but so far I haven't been able to get past this...
+
 #Count no. events in each quadrat using ‘rasterize’ function. 
 #Function can be used to summarize the number of points within each cell, but also to compute statistics based on the ‘marks’
 #For example we could compute the number of different crime types by changing the ‘fun’ argument to another function
@@ -92,7 +94,7 @@ plot(central, add=TRUE)
 
 
 
-### Method 2 - spatstat - drugs (https://www.r-bloggers.com/introductory-point-pattern-analysis-of-open-crime-data-in-london/)
+### Method 2 - spatstat - drugs in Inner London (https://www.r-bloggers.com/introductory-point-pattern-analysis-of-open-crime-data-in-london/)
 
 Drugs <- crime16[crime16$crime_type==unique(crime16$crime_type)[5],]
 
