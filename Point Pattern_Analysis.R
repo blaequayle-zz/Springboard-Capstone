@@ -4,21 +4,28 @@ library(rgeos)
 library(maptools)
 library(gridExtra)
 library(spatstat)
+library(tidyverse)
 
 # Point Pattern Analysis based on: http://rspatial.org/analysis/rst/8-pointpat.html
 
 setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/")
+
+#Transformations
+#We need to have the same CRS for both crime points and the boroughs polygons
+#mollewide is a generic transformation which should work seemlessly with most spatial objects
+mollweide <- "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+
 crime16 <- readRDS('crime16.rds')
 coords <- SpatialPoints(crime16[,c("longitude","latitude")])
 crime16 <- SpatialPointsDataFrame(coords, crime16)
-proj4string(crime16) <- CRS("+init=epsg:4326")
+crime16 <- spTransform(crime16, CRS(mollweide))
 
 setwd("/Users/Blae/Documents/Work/Data Science/gis_boundaries/ESRI/")
-boroughs <- readOGR(dsn = ".", "London_Borough_Excluding_MHW", verbose = FALSE)
+boroughs <- readOGR(dsn = "statistical-gis-boundaries-london/ESRI", "London_Borough_Excluding_MHW", verbose = FALSE)
 central <- boroughs %>% 
   subset(NAME %in% c('Camden','Greenwich','Hackney', 'Hammersmith and Fulham','Islington', 'Kensington and Chelsea','Lambeth','Lewisham', 'Southwark','Tower Hamlets','Wandsworth','Westminster'))
 
-
+central <- spTransform(central, CRS(mollweide))
 plot(crime16)
 plot(central, border = "blue", add = T)
 
@@ -64,13 +71,8 @@ r <- rasterize(central, r)
 plot(r)
 quads <- as(r, 'SpatialPolygons')
 plot(quads, add=TRUE)
-points(crime16, col='red')
+points(crime16, col='red',cex=0.1)
 
-proj4string(crime16) #SpatialPoints DataFrame
-proj4string(central) #SpatialPolygons DataFrame
-central <- spTransform(central, CRS("+init=epsg:4326"))
-
-##There's an issue with the the CRS I think.... I have tried switching so they are both the same but so far I haven't been able to get past this...
 
 #Count no. events in each quadrat using ‘rasterize’ function. 
 #Function can be used to summarize the number of points within each cell, but also to compute statistics based on the ‘marks’
@@ -141,3 +143,4 @@ plot(density.ppp(Drugs.ppp, sigma = bw.diggle(Drugs.ppp),edge=T),main=paste("h =
 plot(density.ppp(Drugs.ppp, sigma = bw.ppl(Drugs.ppp),edge=T),main=paste("h =",round(bw.ppl(Drugs.ppp),2)))
 plot(density.ppp(Drugs.ppp, sigma = bw.scott(Drugs.ppp)[2],edge=T),main=paste("h =",round(bw.scott(Drugs.ppp)[2],2)))
 plot(density.ppp(Drugs.ppp, sigma = bw.scott(Drugs.ppp)[1],edge=T),main=paste("h =",round(bw.scott(Drugs.ppp)[1],2)))
+
