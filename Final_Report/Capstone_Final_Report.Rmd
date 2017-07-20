@@ -2,7 +2,9 @@
 title: "Capstone_Final_Report"
 author: "Blae Quayle"
 date: "6/21/2017"
-output: html_document
+output: 
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
@@ -148,7 +150,7 @@ Abbreviation  |  Crime
 ASB           |  Anti-social behaviour
 BT            |  Bicycle theft
 BU            |  Burglary
-CDA           |  Criminal damage & arson
+CDA           |  Criminal damage and arson
 DR            |  Drugs
 OC            |  Other crime
 OT            |  Other theft
@@ -199,7 +201,7 @@ ggplot(monthly.crime, aes(x = date,  y = Count, fill = crime_abb)) +
   scale_fill_manual(values = crime.col)
 ```
 
-This illustrates the changing classification of crimes over time and suggests there was a drive to classify 'other crimes' into different categories. 'Other theft' did not exist prior to late 2011 and seems to increase by a similar degree to the decrease in 'other crime'. Several other categories are added at this point: drugs, shoplifting, criminal damage & arson, and public disorder weapons. The final tranche of categories were introduced in early 2013 - public order, bicycle theft and theft from the person. By early 2017, the other-crime category was used only minimally.
+This illustrates the changing classification of crimes over time and suggests there was a drive to classify 'other crimes' into different categories. 'Other theft' did not exist prior to late 2011 and seems to increase by a similar degree to the decrease in 'other crime'. Several other categories are added at this point: drugs, shoplifting, criminal damage and arson, and public disorder weapons. The final tranche of categories were introduced in early 2013 - public order, bicycle theft and theft from the person. By early 2017, the other-crime category was used only minimally.
 
 A plot is created using geom_bar() which suggests anti-social behaviour peaks each summer, but due to the scale used it is difficult to analyse it further.
 
@@ -280,7 +282,7 @@ Burglaries have generally decreased since 2012, though there was a surge in Spri
 
 The Leaflet package can be used to visualise the location of crime occurences. A reduced dataset is required and is only useful if the data is filtered to a single year and single crime, due to overlapping or proximal datapoints. Jittering could be used to improve this.
 
-```{r}
+```{r, fig.show = 'hold'}
 VEC.2016 <- crime11to17 %>%
 filter(year == 2016, crime_type == 'vehicle-crime')
 
@@ -301,16 +303,17 @@ for(i in 1:length(bike$latitude)){
   bike$latitude[i] <- bike$latitude[i]+runif(1,0.001,0.004)}
 ```
 
-```{r}
+```{r, fig.show = 'hold'}
 leaflet(bike) %>%
   addTiles() %>% 
   addCircles(~longitude,~latitude)
 ```
-An improvement is visible but it's still difficult to interpret. For this dataset, kernel density estimation (KDE) or chloropleth maps may produce a more useful output.
+
+An improvement is visible but it's still difficult to interpret. To identify crime hotspots, geographical areas of higher than average crime, kernel density estimation (KDE) or chloropleth maps may produce a more useful output.
 
 Kernel Density Estimation (KDE) is a way to estimate the probability density function of a random variable, inferences about the population are made based on a finite data sample. This method requires the `sp`,`KernSmooth` and `leaflet` packages. The latitude and longitude for bicycle thefts are saved in a separate dataframe. KDE is carried out using bkde2D() with the dataframe, bandwidth and gridsize as input. The contour lines created are then converted to spatial polygons.
 
-```{r, echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE, fig.show = 'hold'}
 latlong <- select(bike, longitude, latitude)
 kde <- bkde2D(latlong,
               bandwidth=c(.0055, .0048), gridsize = c(75,75))
@@ -323,14 +326,14 @@ leaflet(spgons) %>% addTiles() %>%
   addPolygons(color = heat.colors(nlev, NULL)[levs])
 ```
 
-This heat map shows a concentration of bicycle thefts in Covent Garden and on the South Bank, two of the most popular tourist areas in London. Whilst this method communicates the information effectively, it would be far more valuable if it covered a larger area.
+This heat map shows a concentration of bicycle thefts in Covent Garden and on the South Bank, two of the most popular tourist areas in London. Whilst this method communicates the information effectively, it would be far more valuable if it covered a larger area. Weakness of KDE include the smooth which occurs between areas and crimes indicated in areas where it is not possible for crimes to occur [1].
 
 #### 6.2 Inner Boroughs 2016 Dataset
 
 The next step is to carry out analysis of the 2016 datasets.
 
 ```{r}
-setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/")
+
 crime16 <- readRDS("crime16.rds")
 monthlycrime16 <- readRDS("monthlycrime16.rds")
 seasonalcrime16 <- readRDS("seasonalcrime16.rds")
@@ -338,7 +341,7 @@ seasonalcrime16 <- readRDS("seasonalcrime16.rds")
 
 To continue with the KDE map creation process, bicycle theft will be repeated again using the more extensive dataset. 
 
-```{r}
+```{r, fig.show='hold'}
 bike16 <- crime16 %>%
   filter(crime_type == 'bicycle-theft')
 
@@ -363,7 +366,7 @@ leaflet(spgons) %>% addTiles() %>%
 The heat map shows the highest concentration of crimes around Russell Square and Covent Garden, in close proximity to three universities: University College Longon, Birkbeck and School of Oriental and Asian Studies. Shoreditch and Dalston are also centres for bike theft. With the more extensive dataset, the South Bank does not stand out as a hotspot for bike theft.
 
 This process was subsequently repeated for burglaries in 2016.
-```{r}
+```{r, fig.show='hold'}
 burglary16 <- crime16 %>%
   filter(crime_type == 'burglary')
 for(i in 1:length(burglary16$latitude)){
@@ -387,7 +390,7 @@ This KDE map shows a high concentration of burglaries in Fitzrovia and into Soho
 
 #Repeat the KDE map process for theft from the person
 
-```{r}
+```{r, fig.show='hold'}
 TFTP16 <- crime16 %>%
   filter(crime_type == 'theft-from-the-person')
 for(i in 1:length(TFTP16$latitude)){
@@ -413,6 +416,7 @@ The KDE map shows a very concentrated hotspot around Soho and Covent Garden, and
 Returning to general analyis, it would be useful to normalise crime occurences by the resident population in each borough. Population figures are taken from the 2013 census data and loaded from csv. 
 
 ```{r}
+
 employment <- read_csv("employment_london.csv")
 employment <- employment %>% 
   as.data.frame() %>%
@@ -446,7 +450,7 @@ ggplot(crime.rate.by.borough) +
   ylab("Crime occurences") +
   xlab("Borough") 
 ```
-There is significant variation between crime in the boroughs with Westminster having the most recorded crimes particularly for other-theft and theft-from-the-person, and Kensingston & Chelsea the least. 
+There is significant variation between crime in the boroughs with Westminster having the most recorded crimes particularly for other-theft and theft-from-the-person, and Kensingston and Chelsea the least. 
 
 The normalisation process will be repeated to the crime categories. Colours are specified for the boroughs to make identification easier.
 
@@ -499,8 +503,7 @@ ggplot(monthlycrime16,aes(x=crime_abb,y=month,fill=Count))+
 Another option for interactively displaying crime density is to use chloropleth mapping. The borough polygons needs to be loaded and then subset to include the 12 inner boroughs of interest.
 
 ```{r}
-setwd("/Users/Blae/Documents/Work/Data Science/gis_boundaries/ESRI/")
-boroughs <- readOGR(dsn = ".", "London_Borough_Excluding_MHW", verbose = FALSE)
+boroughs <- readOGR(dsn = "/Users/Blae/Documents/Work/Data Science/gis_boundaries/ESRI/", "London_Borough_Excluding_MHW", verbose = FALSE)
 central <- boroughs %>% 
   subset(NAME %in% c('Camden','Greenwich','Hackney', 'Hammersmith and Fulham','Islington', 'Kensington and Chelsea','Lambeth','Lewisham', 'Southwark','Tower Hamlets','Wandsworth','Westminster'))
 ```
@@ -533,14 +536,13 @@ central_f <- fortify(central, region="NAME")
 central_f <- left_join(central_f, central@data, by = c("id" = "NAME"))
 ```
 
-A chloropleth map can then be plotted for bicycle thefts in 2016.
+A chloropleth map can then be plotted for bicycle thefts in 2016 [2].
 
 ```{r}
 ggplot() +
   geom_polygon(data = central_f, aes(x = long, y = lat, group = group, fill = bicycle_theft), color = "white", size = 0.2) +
   coord_map() +
   scale_fill_gradientn('Frequency\n', colours = brewer.pal(5,"YlOrRd"), breaks = classes$brks) +
-  theme_nothing(legend = TRUE) +
   labs(title = "Reported bicycle thefts by London borough (2016)")
 ```
 
@@ -560,7 +562,7 @@ for(j in 1:length(labels)){labels [j] =
 
 An interactive chloropleth plot can then be made using OpenStreetMap raster layer in Leaflet. When you roll over the borough it provides the number of records of that offence in a pop up box.
 
-```{r}
+```{r, fig.show='hold'}
 leaflet(data = central) %>% 
   addProviderTiles("OpenStreetMap.BlackAndWhite") %>%
   addPolygons(data = central, 
@@ -578,7 +580,7 @@ leaflet(data = central) %>%
 
 Hackney is the borough with the highest recorded number of bicycle thefts at 1463, Lewisham is the lowest at 371. This is repeated for violent crime and for burglaries.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.show='hold'}
 violent_crime <- crime16[crime16$crime_type == "violent-crime",]
 proj4string(crime16) <- proj4string(central)
 proj4string(violent_crime) <- proj4string(central)
@@ -615,7 +617,7 @@ leaflet(data = central) %>%
             title = "Number of violent crimes")
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.show='hold'}
 burglary <- crime16[crime16$crime_type == "burglary",]
 proj4string(crime16) <- proj4string(central)
 proj4string(burglary) <- proj4string(central)
@@ -656,7 +658,7 @@ Again, burglaries are most prevalent in Westminster and Lambeth, with the lowest
 
 In terms of tourists, the crime which may potentially impact them directly is theft from the person, so one more interactive chloropleth will be built.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.show='hold'}
 theft.from.the.person <- crime16[crime16$crime_type == "theft-from-the-person",]
 proj4string(crime16) <- proj4string(central)
 proj4string(theft.from.the.person) <- proj4string(central)
@@ -698,43 +700,44 @@ The highest occurences of theft from a person are in Westminster, 6101 records i
 
 #### 6.3 Spatial Analysis
 
-Point pattern analysis is the evaluation of the pattern, or distribution, of a set of points on a surface. It can refer to the actual spatial or temporal location of these points or also include data from point sources. 
+Point pattern analysis is the evaluation of the pattern, or distribution, of a set of points on a surface. It can refer to the actual spatial or temporal location of these points or also include data from point sources [3]. 
 
-The first steps are to load addional libraries `raster`, `gridExtra`, `spatstat` and `tidyverse`, then ensure that the same coordinate reference system (CRS) is used for both crime points and borough polygons - WGS84 was selected. The crime data for the inner boroughs for 2016 is filtered to include only burglaries as this method did not function with the full unfiltered dataset. The coordinates for the crime locations and boroughs need to be obtained, these are then plotted to check the process has worked.
+The first steps are to load addional libraries `raster`, `gridExtra`, `spatstat` and `tidyverse`, then ensure that the same coordinate reference system (CRS) is used for both crime points and borough polygons - WGS84 was selected. The crime data for the inner boroughs for 2016 is filtered to include only burglaries in November 2016 as this method did not function with the full unfiltered dataset. The coordinates for the crime locations and boroughs need to be obtained, these are then plotted to check the process has worked. The bulk of the workflow in this section is based on [4].
 
 ```{r, echo = FALSE}
 library(raster)
 library(gridExtra)
 library(spatstat)
 library(tidyverse)
+
 wgs.84       <- "+proj=longlat +datum=WGS84"
-setwd("/Users/Blae/Documents/Work/Data Science/gis_boundaries/ESRI/")
-boroughs <- readOGR(dsn = ".", "London_Borough_Excluding_MHW", verbose = FALSE)
 central <- boroughs %>% 
   subset(NAME %in% c('Camden','Greenwich','Hackney', 'Hammersmith and Fulham','Islington', 'Kensington and Chelsea','Lambeth','Lewisham', 'Southwark','Tower Hamlets','Wandsworth','Westminster'))
-setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/")
+
 crime16 <- readRDS('crime16.rds')
-burglary16 <- crime16 %>%
-  filter(crime_type == "burglary")
-coords <- SpatialPoints(burglary16[,c("longitude","latitude")])
-burglary16 <- SpatialPointsDataFrame(coords, burglary16)
-proj4string(burglary16) <- CRS(wgs.84)
-burglary16 <- spTransform(burglary16, CRS(proj4string(central)))
-plot(burglary16)
+burglary16.2 <- crime16 %>%
+  filter(crime_type == "burglary") %>%
+  filter(month == 11)
+
+coords <- SpatialPoints(burglary16.2[,c("longitude","latitude")])
+burglary16.2 <- SpatialPointsDataFrame(coords, burglary16.2)
+proj4string(burglary16.2) <- CRS(wgs.84)
+burglary16.2 <- spTransform(burglary16.2, CRS(proj4string(central)))
+plot(burglary16.2)
 plot(central, border = "blue", add = T)
-xy <- coordinates(burglary16)
+xy <- coordinates(burglary16.2)
 dim(xy)
 xy <- unique(xy)
 dim(xy)
 ```
 
-Duplicated crime locations must be removed for this technique to be correctly executed. Due to the 'map points' previously mentioned, many locations are duplications. When these are removed the dataset reduces from 28515 to 11733 unique sets of coordinates. Basic statistics are calculated, mean centre and standard distance for the crime locations, and plotted with a summary circle created by dividing the circle into 360 points and computing the bearing in radians. The crime location density is then calculated as 39 per km2.
+Duplicated crime locations must be removed for this technique to be correctly executed. Due to the 'map points' previously mentioned, many locations are duplications. When these are removed the dataset reduces from 2414 to 1925 unique sets of coordinates. Basic statistics are calculated, mean centre and standard distance for the crime locations, and plotted with a summary circle created by dividing the circle into 360 points and computing the bearing in radians. The crime location density is then calculated as 6.4 per km2.
 
 ```{r, echo = FALSE}
 mc <- apply(xy, 2, mean)
 sd <- sqrt(sum((xy[,1] - mc[1])^2 + (xy[,2] - mc[2])^2) / nrow(xy))
 plot(central, col='light blue')
-points(burglary16) #The city of London gap is very clear
+points(burglary16.2) #The city of London gap is very clear
 points(cbind(mc[1], mc[2]), pch='*', col='red', cex=0.5)
 bearing <- 1:360 * pi/180
 cx <- mc[1] + sd * cos(bearing)
@@ -757,9 +760,9 @@ r <- rasterize(central, r)
 plot(r)
 quads <- as(r, 'SpatialPolygons')
 plot(quads, add=TRUE)
-points(burglary16, col='red',cex=0.1)
+points(burglary16.2, col='red',cex=0.1)
 
-nc <- rasterize(coordinates(burglary16), r, fun='count', background=0)
+nc <- rasterize(coordinates(burglary16.2), r, fun='count', background=0)
 plot(nc)
 plot(central, add=TRUE)
 f <- freq(nc, useNA='no')
@@ -778,7 +781,7 @@ ff$XKmu2 <- ff$Kmu2 * ff$X
 head(ff)
 ```
 
-This indicates that the 165 quadrats with no crime locations are the null ones that lie outside the boroughs. There are 7 quadrats with over 240 different crime locations. There is a higher frequency of quadrats with up to 100 crime locations, than over 100 locations. The average number of crime locations per quadrat is 55.6. Statistics can also be calculated using the quadrat data.
+This indicates that the 201 quadrats with no crime locations at all include the null ones that lie outside the boroughs. There are 5 quadrats with over 30 different crime locations. The average number of crime locations per quadrat is 4.7. Statistics can also be calculated using the quadrat data.
 
 ```{r}
 s2 <- sum(ff$XKmu2) / (sum(ff$X)-1)
@@ -805,7 +808,7 @@ The mean nearest neighbour distance is `r mdmin` metres. The top 25 most isolate
 
 ```{r, echo = FALSE}
 plot(central)
-points(burglary16, cex=.1)
+points(burglary16.2, cex=.1)
 ord <- rev(order(dmin))
 far25 <- ord[1:25]
 neighbours <- wdmin[far25]
@@ -825,7 +828,7 @@ distance <- sort(unique(round(dmin)))
 Gd <- sapply(distance, function(x) sum(dmin < x))
 Gd <- Gd / length(dmin)
 plot(distance, Gd)
-plot(distance, Gd, xlim=c(0,300))
+plot(distance, Gd, xlim=c(0,600))
 ```
 
 With evenly-spaced events G(d) should rise gradually up to the distance at which most events are spaced, and then increase rapidly. For clustered events G(d) rises rapidly at short distances, and then levels off at larger d-values. The distribution is more clustered than evenly spaced. 
@@ -857,7 +860,7 @@ plot(distance, Gd, type='l', lwd=2, col='red', las=1,
 lines(Fdistance, Fd, lwd=2, col='blue')
 lines(0:2000, expected, lwd=2)
 
-legend(1200, .3, c(expression(italic("G")["d"]), expression(italic("F")["d"]), 'expected'),
+legend(800, .3, c(expression(italic("G")["d"]), expression(italic("F")["d"]), 'expected'),
        lty=1, col=c('red', 'blue', 'black'), lwd=2, bty="n")
 
 distance <- seq(1, 30000, 100)
@@ -880,32 +883,48 @@ ds <- density(p)
 class(ds)
 plot(ds, main='Burglary density')
 
-burglary16$fcat <- as.factor(burglary16$crime_type)
+burglary16.2$fcat <- as.factor(burglary16.2$crime_type)
+burglary16.2 <- remove.duplicates(burglary16.2)
+
 w <- as.owin(central)
-xy <- coordinates(burglary16)
-mpp <- ppp(xy[,1], xy[,2], window = w, marks=burglary16$fcat)
+xy <- coordinates(burglary16.2)
+mpp <- ppp(xy[,1], xy[,2], window = w, marks=burglary16.2$fcat)
 spp <- split(mpp)
 ```
 
-K-plots with an envelope were produced for burglary. These took an extended period of time to calculate. 
+K-plots with an envelope were produced for burglary. 
 
-```{r, echo = FALSE}
+```{r, eval = FALSE}
 spatstat.options(checksegments = FALSE)
 kburglary <- Kest(spp$"burglary")
 keburglary <- envelope(spp$"burglary", Kest)
 
 par(mfrow=c(1,2))
-plot(kburglary)
+plot(kburglary, xlim=c(0,2500))
+png("kburglary.png")
 plot(keburglary)
+png("keburglary.png")
 
 ```
+
+![kburglary plot](/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report/keburglary.png)
+
+![keburglary plot](/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report/kburglary.png)
 
 In order to determine if population density is a good predictor of burglary, a Kolmogorov-Smirnov (‘kstest’) test was carried out using population density as a covariate:
 
-```{r}
-KS.burglary <- cdf.test(spp$burglary, ds)
+```{r, eval = FALSE}
+KS.burglary <- kstest(spp$burglary, ds)
 KS.burglary
 ```
+This gives the following result:
+Spatial Kolmogorov-Smirnov test of CSR in two dimensions
+data:  covariate ‘ds’ evaluated at points of ‘spp$burglary’ 
+and transformed to uniform distribution under CSR
+D = 0.21068, p-value < 2.2e-16
+alternative hypothesis: two-sided
+
+This function performs a goodness-of-fit test of a Poisson point process model fitted to point pattern data. The observed distribution of the values of a spatial covariate at the data points, and the predicted distribution of the same values under the model, are compared. The null hypothesis is that 2 independent samples are drawn from the same continuous distribiton. The output reports maximum difference between the two cumulative distributions (D), and calculates a P value from that and the sample sizes [5]. The P value is small (2.2e-16) so it is concluded that the two groups were sampled from populations with different distributions and the null hypothesis is rejected.
 
 ### 7. Data Presentation 
 
@@ -919,7 +938,7 @@ KDE is a valuable method for visualising the density of crimes when displaying a
 
 The distribution of crimes across across the inner London boroughs varies widely. Westminster, with one of the lowest populations, displays the largest number of crimes at 28.7 per 100 people. Violent crimes peak in Westminster and Lambeth. There is a clear split between higher values in central, south and east London, with lower values in north and west london. Burglaries are also most prevalent in Westminster and Lambeth, with the lowest in Kensington and Chelsea and Hammersmith and Fulham.
 
-Spatial analysis using point pattern analysis has shown that the most isolated occurences of burglary tend to occur on the periphery of the inner London boroughs or within the parks. The dataset is highly clustered based on the G and F functions, this is further confirmed by the VMR. The mean nearest neighbour distance is 83m and the maximum nearest neighbour is 854m. A main constraint of the dataset used is the lack of unique geographic location resulting in more than half the records being discounted from the analysis as they are non-unique.
+Spatial analysis using point pattern analysis has shown that the most isolated occurences of burglary tend to occur on the periphery of the inner London boroughs or within the parks. The dataset is highly clustered based on the G and F functions, this is further confirmed by the VMR. The mean nearest neighbour distance is 83m and the maximum nearest neighbour is 854m. A main constraint of the dataset used is the lack of unique geographic location resulting in more than half the records being discounted from the analysis as they are non-unique. The P value found using the Kolmogorov-Smirnov test is very small (2.2e-16) so it is concluded that the two groups used were sampled from populations with different distributions and the null hypothesis of a continuous distribution is rejected.
 
 ### 9. Further Work and Recommendations
 
@@ -935,6 +954,19 @@ The client focus was threefold for this project, the local residents, the touris
 
 3. For local residents, think twice before locking your bike up in the area around the universities in Russell Square or Shoreditch - there's a far greater risk of it getting stolen here than elsewhere, always make sure to lock up your car in the summer and if they're looking for the 'safest' inner London borough then move to Wandsworth which had only 9.66 crimes per 100 people in 2016, compared to Westminster's 28.7 crimes per 100 people.
 
+### 10. References
 
+[1]Identifying hotspots:an assessment of common techniques, Spencer Chainey, UCL Jill Danda Institue of Crime Science
+http://www.ucl.ac.uk/jdi/events/int-CIA-conf/ICIAC11_Slides/ICIAC11_1C_SChainey
 
+[2] Making Maps with R, Eric Anderson
+http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html 
+
+[3] An Introduction to Point Pattern Analysis http://gispopsci.org/point-pattern-analysis/
+
+[4] Point Pattern Analysis from R Spatial 
+http://rspatial.org/analysis/rst/8-pointpat.html
+
+[5] Interpreting results: Kolmogorov-Smirnov test from GraphPad Software
+https://www.graphpad.com/guides/prism/7/statistics/interpreting_results_kolmogorov-smirnov_test.htm
 
