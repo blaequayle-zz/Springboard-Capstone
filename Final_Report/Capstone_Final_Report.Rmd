@@ -2,14 +2,17 @@
 title: "Capstone Final Report"
 author: "Blae Quayle"
 date: "6/21/2017"
-output: html_document
+output: 
+  md_document:
+  variant: markdown_github
+always_allow_html: yes
 ---
 
-```{r setup, include=FALSE}
+  ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Capstone Milestone Report
+## Temporal and Spatial Analysis of Street Crime in Inner London
 ### 1. Introduction 
 
 The Metropolitan Police operate across 32 boroughs within Greater London and aim to make London the safest global city. To this end, an accessible method allowing both residents and tourists to check where crime hotspots are located would allow them to make informed decisions about where they go and encourage preventative action. This would be a useful service for the Met Police to promote with the aim of reducing opportunistic crimes by raising awareness of the highest risk areas.
@@ -501,7 +504,7 @@ ggplot(monthlycrime16,aes(x=crime_abb,y=month,fill=Count))+
 Another option for interactively displaying crime density is to use chloropleth mapping. The borough polygons needs to be loaded and then subset to include the 12 inner boroughs of interest.
 
 ```{r}
-boroughs <- readOGR(dsn = "/Users/Blae/Documents/Work/Data Science/gis_boundaries/ESRI/", "London_Borough_Excluding_MHW", verbose = FALSE)
+boroughs <- readOGR(dsn = "statistical-gis-boundaries-london/ESRI", "London_Borough_Excluding_MHW", verbose = FALSE)
 central <- boroughs %>% 
   subset(NAME %in% c('Camden','Greenwich','Hackney', 'Hammersmith and Fulham','Islington', 'Kensington and Chelsea','Lambeth','Lewisham', 'Southwark','Tower Hamlets','Wandsworth','Westminster'))
 ```

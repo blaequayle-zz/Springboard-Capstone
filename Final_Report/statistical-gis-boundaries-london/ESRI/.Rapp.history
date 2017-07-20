@@ -1,0 +1,4 @@
+load("/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report/gis_boundaries/ESRI/annualcrime16.rds")
+load("/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report/gis_boundaries/ESRI/central16.rds")
+load("/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report/gis_boundaries/ESRI/central2016.rds")
+load("/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report/gis_boundaries/ESRI/seasonalcrime16.rds")
