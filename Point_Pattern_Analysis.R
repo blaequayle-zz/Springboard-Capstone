@@ -525,9 +525,14 @@ spatstat.options(checksegments = FALSE)
 kburglary <- Kest(spp$"burglary")
 keburglary <- envelope(spp$"burglary", Kest)
 
+setwd("/Users/Blae/Documents/Work/Data Science/Capstone_Project/Final_Report")
 par(mfrow=c(1,2))
+
 plot(kburglary, xlim=c(0,2500))
+png("kburglary.png")
+
 plot(keburglary)
+png("keburglary.png")
 
 #Is population density a good predictor of burglary? 
 #To formally test the hypothesis of Complete Spatial Randomness you can use the Kolmogorov-Smirnov test based on values of a covariate (kstest), in this case pop. density
