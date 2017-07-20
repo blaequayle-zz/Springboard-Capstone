@@ -1,10 +1,8 @@
 ---
-title: "Capstone_Final_Report"
+title: "Capstone Final Report"
 author: "Blae Quayle"
 date: "6/21/2017"
-output: 
-  md_document:
-    variant: markdown_github
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -580,7 +578,7 @@ leaflet(data = central) %>%
 
 Hackney is the borough with the highest recorded number of bicycle thefts at 1463, Lewisham is the lowest at 371. This is repeated for violent crime and for burglaries.
 
-```{r, echo = FALSE, fig.show='hold'}
+```{r, echo = FALSE, fig.show='hold', warning=FALSE, message=FALSE}
 violent_crime <- crime16[crime16$crime_type == "violent-crime",]
 proj4string(crime16) <- proj4string(central)
 proj4string(violent_crime) <- proj4string(central)
@@ -617,7 +615,7 @@ leaflet(data = central) %>%
             title = "Number of violent crimes")
 ```
 
-```{r, echo = FALSE, fig.show='hold'}
+```{r, echo = FALSE, fig.show='hold', warning=FALSE, message=FALSE}
 burglary <- crime16[crime16$crime_type == "burglary",]
 proj4string(crime16) <- proj4string(central)
 proj4string(burglary) <- proj4string(central)
@@ -658,7 +656,7 @@ Again, burglaries are most prevalent in Westminster and Lambeth, with the lowest
 
 In terms of tourists, the crime which may potentially impact them directly is theft from the person, so one more interactive chloropleth will be built.
 
-```{r, echo = FALSE, fig.show='hold'}
+```{r, echo = FALSE, fig.show='hold', message=FALSE, warning=FALSE}
 theft.from.the.person <- crime16[crime16$crime_type == "theft-from-the-person",]
 proj4string(crime16) <- proj4string(central)
 proj4string(theft.from.the.person) <- proj4string(central)
@@ -704,7 +702,7 @@ Point pattern analysis is the evaluation of the pattern, or distribution, of a s
 
 The first steps are to load addional libraries `raster`, `gridExtra`, `spatstat` and `tidyverse`, then ensure that the same coordinate reference system (CRS) is used for both crime points and borough polygons - WGS84 was selected. The crime data for the inner boroughs for 2016 is filtered to include only burglaries in November 2016 as this method did not function with the full unfiltered dataset. The coordinates for the crime locations and boroughs need to be obtained, these are then plotted to check the process has worked. The bulk of the workflow in this section is based on [4].
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 library(raster)
 library(gridExtra)
 library(spatstat)
