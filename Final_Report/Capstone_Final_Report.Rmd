@@ -2,10 +2,8 @@
 title: "Capstone Final Report"
 author: "Blae Quayle"
 date: "6/21/2017"
-output: 
-  md_document:
-  variant: markdown_github
-always_allow_html: yes
+output: pdf_document
+
 ---
 
   ```{r setup, include=FALSE}
@@ -949,7 +947,7 @@ If data download constraints were not an issue, a larger dataset covering all of
 
 The client focus was threefold for this project, the local residents, the tourists and the Met Police. There are several recommendations which can be made as a result of the work carried out:
 
-1. The Shiny could be made publicly available to encourage both residents and tourists to check crime hotspots. This would support their aim of making London the safest global city and puts data directly into the hands of the general public, allowing them to take informed decisions.
+1. The Shiny App could be made publicly available to encourage both residents and tourists to check crime hotspots. This would support their aim of making London the safest global city and puts data directly into the hands of the general public, allowing them to take informed decisions.
 
 2. For tourists, always be on high alert for pickpockets when visiting tourist attractions in Westminster, especially the areas around Soho and Covent Garden, and when visiting Shoreditch.
 
@@ -957,7 +955,7 @@ The client focus was threefold for this project, the local residents, the touris
 
 ### 10. References
 
-[1]Identifying hotspots:an assessment of common techniques, Spencer Chainey, UCL Jill Danda Institue of Crime Science
+[1]Identifying hotspots:an assessment of common techniques, Spencer Chainey, UCL Jill Dando Institute of Crime Science
 http://www.ucl.ac.uk/jdi/events/int-CIA-conf/ICIAC11_Slides/ICIAC11_1C_SChainey
 
 [2] Making Maps with R, Eric Anderson
