@@ -1,6 +1,6 @@
 ### Capstone Project: Temporal and Spatial Analysis of Street Crime in Inner London
 
-This repository contains the documentation and code for my Capstone project undertaken as part of Springboard's Foundation of Data Science course.
+This repository contains the documentation and code for my Capstone project undertaken as part of Springboard's Foundation of Data Science course between April and July 2017 with support from my mentor Dhiraj Khanna.
 
 The sections of the Capstone project include:
 1. Project proposal - this covers the problem to solve, the client and why they care about the problem, the dataset, the approach to solving the problem and the deliverables.
